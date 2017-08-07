@@ -22,7 +22,6 @@ function Author ($http, $httpParamSerializerJQLike, $cookies) {
 
     self.saveName = function () {
         self.nameEditable = false;
-        //todo: вынести отдельно
         var config = {
             headers : {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'

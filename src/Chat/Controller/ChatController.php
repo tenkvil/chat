@@ -51,8 +51,12 @@ class ChatController
      */
     public function newMessageAction(Request $request) : Response
     {
-        //@todo проверка что все данные пришли
         $data = $request->request->all();
+
+        if (!$data['userName'] || !$data['text'] || !$data['token']) {
+            return new Response("{\"status\": \"Error\"}", 400);
+        }
+
         $messagesRepository = new MessagesRepository();
         $messagesRepository->addMessage($data['userName'], $data['text'], $data['token']);
         $this->sendEventToClient();
