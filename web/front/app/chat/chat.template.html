@@ -1,0 +1,37 @@
+<div class="chat-container">
+
+    <div class="chat-header">
+        <h1>Welcome to the simple chat!</h1>
+    </div>
+
+    <div class="chat-messages">
+        <div class="chat-messages__message" ng-repeat="message in $ctrl.messages">
+            <div class="chat-messages__sender-info">
+                <div class="author">
+                    <author message="message" token="$ctrl.token"></author>
+                </div>
+                <div class="date">{{ message.date }}</div>
+            </div>
+
+            <div class="chat-messages__content">{{message.text}}</div>
+
+            <div class="chat-messages__controls">
+                <div>
+                    <i ng-if="message.token == $ctrl.token" ng-click="$ctrl.removeMessage(message.id)" class="ico remove-msg"></i>
+                </div>
+
+                <div class="like-wrapper">
+                    <i class="ico like-msg" ng-click="$ctrl.likeMessage(message.id)"></i>
+                    <i class="counter">{{ message.likeCount != 0 ? message.likeCount : '' }}</i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-footer">
+        <div class="chat-footer__controls">
+            <textarea hc-enter-event="$ctrl.sendMessage()" ng-model="$ctrl.text" rows="10"></textarea>
+            <i class="ico send-button" ng-click="$ctrl.sendMessage()"></i>
+        </div>
+    </div>
+</div>

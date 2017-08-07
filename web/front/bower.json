@@ -1,0 +1,11 @@
+{
+  "name": "angular-simple-chat",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular": "1.5.x",
+    "angular-mocks": "1.5.x",
+    "angular-cookies": "1.5.x"
+  }
+}

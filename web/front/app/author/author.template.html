@@ -1,0 +1,9 @@
+<div ng-show="!$ctrl.nameEditable">
+    {{ $ctrl.message.userName }}
+    <i ng-if="$ctrl.message.token == $ctrl.token" class="ico edit-btn" ng-click="$ctrl.editName()"></i>
+</div>
+
+<div ng-show="$ctrl.nameEditable">
+    <input type="text" ng-model="$ctrl.authorName" value="{{ $ctrl.message.userName }}">
+    <i ng-if="$ctrl.message.token == $ctrl.token" class="ico ok-btn" ng-click="$ctrl.saveName()"></i>
+</div>
