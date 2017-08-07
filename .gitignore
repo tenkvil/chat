@@ -1,0 +1,3 @@
+/vendor/*
+/web/front/node_module/*
+/web/public/bower_components/*
