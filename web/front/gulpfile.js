@@ -3,14 +3,6 @@ const less         = require('gulp-less');
 const cssnano      = require('gulp-cssnano');
 const autoprefixer = require('gulp-autoprefixer');
 
-
-// *.less
-// /**/*.js
-// !test.less
-// src(['!app/less/main.less', app/less/*])
-// /*.+(scss|sass)
-// _part.less
-
 gulp.task('less', function () {
     return gulp.src('less/main.less')
         .pipe(less())

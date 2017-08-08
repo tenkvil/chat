@@ -30,7 +30,7 @@
 
     <div class="chat-footer">
         <div class="chat-footer__controls">
-            <textarea ng-model="$ctrl.text" rows="10"></textarea>
+            <textarea id="textarea" ng-model="$ctrl.text" rows="10"></textarea>
             <i class="ico send-button" ng-class="{enabled: $ctrl.canSend}" ng-click="$ctrl.sendMessage()"></i>
         </div>
     </div>

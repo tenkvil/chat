@@ -31,6 +31,17 @@ function Chat($http, $scope, $httpParamSerializerJQLike, $cookies, $timeout, ab,
         }, 400);
     }
 
+    function getTextarea() {
+        return angular.element(document.getElementById ("textarea"));
+    }
+
+    getTextarea().bind('keyup', function(event){
+        var enterKeyCode = 13;
+        if (event.keyCode == enterKeyCode) {
+            self.sendMessage();
+        }
+    });
+
     var conn = new ab.Session('ws://localhost:1234',
         function() {
             conn.subscribe('pubSub', function(topic, data) {
