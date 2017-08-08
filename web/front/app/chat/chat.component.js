@@ -4,22 +4,38 @@ angular.module('chat')
         controller: Chat
     });
 
-Chat.$inject = ['$http','$scope','$httpParamSerializerJQLike', '$cookies', 'ab'];
+Chat.$inject = ['$http', '$scope', '$httpParamSerializerJQLike', '$cookies', '$timeout', 'ab', 'XHRConfig'];
 
-function Chat($http, $scope, $httpParamSerializerJQLike, $cookies, ab) {
+function Chat($http, $scope, $httpParamSerializerJQLike, $cookies, $timeout, ab, XHRConfig) {
     var self = this;
 
     self.text = '';
+    self.canSend = false;
     self.token = $cookies.get('user_token');
     $http.get('/front.php/getAllChats').then(function(responce) {
-        self.messages = responce.data.data;
+        self.messages = JSON.parse(responce.data).data;
+        scrollDown();
     });
+
+    $scope.$watch(
+        function(){ return self.text },
+        function(text) {
+            self.canSend = !!text.length;
+        }
+    );
+
+    function scrollDown() {
+        $timeout(function () {
+            var element = angular.element(document.getElementsByClassName("chat-messages"));
+            element[0].scrollTop = element[0].scrollHeight;
+        }, 400);
+    }
 
     var conn = new ab.Session('ws://localhost:1234',
         function() {
             conn.subscribe('pubSub', function(topic, data) {
                 $http.get('/front.php/getAllChats').then(function(responce) {
-                    self.messages = responce.data.data;
+                    self.messages = JSON.parse(responce.data).data;
                 });
             });
         },
@@ -30,35 +46,34 @@ function Chat($http, $scope, $httpParamSerializerJQLike, $cookies, ab) {
     );
 
     self.sendMessage = function () {
-        var config = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-            }
-        };
+        if (!self.canSend) {
+            return null;
+        }
+
         var data = {"userName":$cookies.get('user_name'), "text": self.text, "token": self.token};
 
-        $http.post('/front.php/newMessage', $httpParamSerializerJQLike(data), config).then(function(response) {});
+        $http.post('/front.php/newMessage', $httpParamSerializerJQLike(data), XHRConfig).then(function(response) {
+            self.text = '';
+            scrollDown();
+        });
     };
 
+    /**
+     * @param number id
+     */
     self.removeMessage = function(id) {
-        var config = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-            }
-        };
-        var data = {"id":id, "token": self.token};
+        var data = {"id": id, "token": self.token};
 
-        $http.post('/front.php/removeMessage', $httpParamSerializerJQLike(data), config).then(function(response) {});
+        $http.post('/front.php/removeMessage', $httpParamSerializerJQLike(data), XHRConfig).then(function(response) {});
     };
 
+    /**
+     * @param number id
+     */
     self.likeMessage = function(id) {
-        var config = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-            }
-        };
-        var data = {"id":id};
+        var data = {"id": id};
 
-        $http.post('/front.php/likeMessage', $httpParamSerializerJQLike(data), config).then(function(response) {});
+        $http.post('/front.php/likeMessage', $httpParamSerializerJQLike(data), XHRConfig).then(function(response) {});
     };
 }
+

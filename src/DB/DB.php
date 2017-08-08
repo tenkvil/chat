@@ -1,8 +1,6 @@
 <?php
 namespace App\DB;
 
-use App\Chat\Model\User;
-
 class DB {
     private const HOST = 'localhost';
     private const DB   = 'chat';

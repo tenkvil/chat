@@ -3,6 +3,7 @@ namespace App\Chat\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Chat\Repository\MessagesRepository;
 use App\Chat\Model\Message;
 
@@ -16,13 +17,13 @@ class ChatController
      */
     public function indexAction() : Response
     {
-        return new Response($this->renderIndex());
+        return new Response($this->renderIndex(), 200);
     }
 
     /**
-     * @return Response
+     * @return JsonResponse
      */
-    public function getAllChatsAction() : Response
+    public function getAllChatsAction() : JsonResponse
     {
         $messagesRepository = new MessagesRepository();
         $messages= $messagesRepository->getAll();
@@ -40,85 +41,89 @@ class ChatController
             ]);
         }
 
-        $data = json_encode($prepareMessage);
+        $data = [
+            'status' => 'Ok',
+            'data' => $prepareMessage
+        ];
 
-        return new Response("{\"status\": \"Ok\", \"data\": $data}", 200);
+        return new JsonResponse(json_encode($data), 200);
     }
 
     /**
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
-    public function newMessageAction(Request $request) : Response
+    public function newMessageAction(Request $request) : JsonResponse
     {
         $data = $request->request->all();
 
         if (!$data['userName'] || !$data['text'] || !$data['token']) {
-            return new Response("{\"status\": \"Error\"}", 400);
+
+            return new JsonResponse(json_encode(['status' => 'Error']), 400);
         }
 
         $messagesRepository = new MessagesRepository();
         $messagesRepository->addMessage($data['userName'], $data['text'], $data['token']);
         $this->sendEventToClient();
 
-        return new Response("{\"status\": \"Ok\"}", 200);
+        return new JsonResponse(json_encode(['status' => 'Ok']), 200);
     }
 
     /**
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
-    public function removeMessageAction(Request $request) : Response
+    public function removeMessageAction(Request $request) : JsonResponse
     {
         $data = $request->request->all();
 
         if (!$data['id']) {
-            return new Response("{\"status\": \"Error\"}", 400);
+            return new JsonResponse(json_encode(['status' => 'Error']), 400);
         }
 
         $messagesRepository = new MessagesRepository();
         $messagesRepository->deleteMessage($data['id'], $data['token']);
         $this->sendEventToClient();
 
-        return new Response("{\"status\": \"Ok\"}", 200);
+        return new JsonResponse(json_encode(['status' => 'Ok']), 200);
     }
 
     /**
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
-    public function likeMessageAction(Request $request) : Response
+    public function likeMessageAction(Request $request) : JsonResponse
     {
         $data = $request->request->all();
 
         if (!$data['id']) {
-            return new Response("{\"status\": \"Error\"}", 400);
+            return new JsonResponse(json_encode(['status' => 'Error']), 400);
         }
 
         $messagesRepository = new MessagesRepository();
         $messagesRepository->likeMessage($data['id']);
         $this->sendEventToClient();
 
-        return new Response("{\"status\": \"Ok\"}", 200);
+        return new JsonResponse(json_encode(['status' => 'Ok']), 200);
     }
 
     /**
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
-    public function changeNameAction (Request $request) : Response
+    public function changeNameAction (Request $request) : JsonResponse
     {
         $data = $request->request->all();
 
         if (!$data['userName'] || !$data['token']) {
-            return new Response("{\"status\": \"Error\"}", 400);
+            return new JsonResponse(json_encode(['status' => 'Error']), 400);
         }
 
         $messagesRepository = new MessagesRepository();
         $messagesRepository->changeNameByToken($data['userName'], $data['token']);
         $this->sendEventToClient();
 
-        return new Response("{\"status\": \"Ok\"}", 200);
+        return new JsonResponse(json_encode(['status' => 'Ok']), 200);
     }
 
     /**

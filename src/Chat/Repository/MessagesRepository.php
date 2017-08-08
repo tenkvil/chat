@@ -92,6 +92,10 @@ class MessagesRepository
         $statement->execute();
     }
 
+    /**
+     * @param string $userName
+     * @param string $token
+     */
     public function changeNameByToken($userName, $token)
     {
         $statement = $this->connection->prepare (

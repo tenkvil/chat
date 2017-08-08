@@ -1,5 +1,5 @@
 {
-  "name": "chat-project",
+  "name": "chat/simple-chat",
   "description": "Test chat app",
   "license": "MIT",
   "autoload": {
