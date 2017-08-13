@@ -12,9 +12,27 @@ function Chat($http, $scope, $httpParamSerializerJQLike, $cookies, $timeout, ab,
     self.text = '';
     self.canSend = false;
     self.token = $cookies.get('user_token');
-    $http.get('/front.php/getAllChats').then(function(responce) {
-        self.messages = JSON.parse(responce.data).data;
+    self.CSRF = $cookies.get('CSRF');
+    $http.get('/front.php/getAllChats').then(function(response) {
+        self.messages = JSON.parse(response.data).data;
         scrollDown();
+    });
+
+    $http.get('/front.php/getSettings').then(function(response) {
+        var settings = JSON.parse(response.data).data;
+        var conn = new ab.Session('ws://' + settings.host + ':' + settings.port,
+            function() {
+                conn.subscribe('pubSub', function(topic, data) {
+                    $http.get('/front.php/getAllChats').then(function(response) {
+                        self.messages = JSON.parse(response.data).data;
+                    });
+                });
+            },
+            function() {
+                console.warn('WebSocket connection closed');
+            },
+            {'skipSubprotocolCheck': true}
+        );
     });
 
     $scope.$watch(
@@ -42,26 +60,17 @@ function Chat($http, $scope, $httpParamSerializerJQLike, $cookies, $timeout, ab,
         }
     });
 
-    var conn = new ab.Session('ws://localhost:1234',
-        function() {
-            conn.subscribe('pubSub', function(topic, data) {
-                $http.get('/front.php/getAllChats').then(function(responce) {
-                    self.messages = JSON.parse(responce.data).data;
-                });
-            });
-        },
-        function() {
-            console.warn('WebSocket connection closed');
-        },
-        {'skipSubprotocolCheck': true}
-    );
-
     self.sendMessage = function () {
         if (!self.canSend) {
             return null;
         }
 
-        var data = {"userName":$cookies.get('user_name'), "text": self.text, "token": self.token};
+        var data = {
+            "userName":$cookies.get('user_name'),
+            "text": self.text,
+            "token": self.token,
+            "CSRF": self.CSRF
+        };
 
         $http.post('/front.php/newMessage', $httpParamSerializerJQLike(data), XHRConfig).then(function(response) {
             self.text = '';
@@ -73,7 +82,11 @@ function Chat($http, $scope, $httpParamSerializerJQLike, $cookies, $timeout, ab,
      * @param number id
      */
     self.removeMessage = function(id) {
-        var data = {"id": id, "token": self.token};
+        var data = {
+            "id": id,
+            "token": self.token,
+            "CSRF": self.CSRF
+        };
 
         $http.post('/front.php/removeMessage', $httpParamSerializerJQLike(data), XHRConfig).then(function(response) {});
     };
@@ -82,7 +95,10 @@ function Chat($http, $scope, $httpParamSerializerJQLike, $cookies, $timeout, ab,
      * @param number id
      */
     self.likeMessage = function(id) {
-        var data = {"id": id};
+        var data = {
+            "id": id,
+            "CSRF": self.CSRF
+        };
 
         $http.post('/front.php/likeMessage', $httpParamSerializerJQLike(data), XHRConfig).then(function(response) {});
     };

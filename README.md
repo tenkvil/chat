@@ -22,6 +22,7 @@ Simple chat application
  bower install
  npm install
  gulp less
+ php bin/BuildDB.php
  ```
 
 ### To start the application you need to run:

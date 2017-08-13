@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Chat\Repository\MessagesRepository;
 use App\Chat\Model\Message;
+use App\Chat\Helpers\SettingsHelper;
+use App\Chat\Helpers\TokenHelper;
 
 /**
  * Class chatController
@@ -18,6 +20,20 @@ class ChatController
     public function indexAction() : Response
     {
         return new Response($this->renderIndex(), 200);
+    }
+
+    public function getSettingsAction() : JsonResponse
+    {
+        $host = SettingsHelper::getSetting('frontWS', 'host');
+        $port = SettingsHelper::getSetting('pusherServer', 'port');
+
+        return new JsonResponse(json_encode([
+            'status' => 'Ok',
+            'data' => [
+                'host' => $host,
+                'port' => $port
+            ]
+        ]), 200);
     }
 
     /**
@@ -57,8 +73,11 @@ class ChatController
     {
         $data = $request->request->all();
 
-        if (!$data['userName'] || !$data['text'] || !$data['token']) {
+        if (!$data['userName'] || !$data['text'] || !$data['token'] || !$data['CSRF']) {
+            return new JsonResponse(json_encode(['status' => 'Error']), 400);
+        }
 
+        if($data['CSRF'] =! TokenHelper::getCSRFToken()) {
             return new JsonResponse(json_encode(['status' => 'Error']), 400);
         }
 

@@ -1,13 +1,12 @@
 <?php
 namespace App\DB;
 
-class DB {
-    private const HOST = 'localhost';
-    private const DB   = 'chat';
-    private const USER = 'root';
-    private const PASSWORD = '';
-    private const CHARSET = 'utf8';
+use App\Chat\Helpers\SettingsHelper;
 
+/**
+ * Class DB
+ */
+class DB {
     /**
      * @var \PDO
      */
@@ -18,10 +17,16 @@ class DB {
      */
     public static function connect() {
         if (!self::$pdo) {
+            $host = SettingsHelper::getSetting('database', 'host');
+            $user = SettingsHelper::getSetting('database', 'user');
+            $pass = SettingsHelper::getSetting('database', 'pass');
+            $charset = SettingsHelper::getSetting('database', 'charset');
+            $db = SettingsHelper::getSetting('database', 'db');
+
             $dsn = sprintf("mysql:host=%s;dbname=%s;charset=%s",
-                self::HOST,
-                self::DB,
-                self::CHARSET
+                $host,
+                $db,
+                $charset
             );
 
             $opt = [
@@ -30,8 +35,7 @@ class DB {
                 \PDO::ATTR_EMULATE_PREPARES => false,
             ];
 
-
-            self::$pdo = new \PDO($dsn, self::USER, self::PASSWORD, $opt);
+            self::$pdo = new \PDO($dsn, $user, $pass, $opt);
         }
 
         return self::$pdo;

@@ -9,7 +9,11 @@ use Symfony\Component\Routing\RequestContext;
 use App\Chat\Helpers\TokenHelper;
 use App\Chat\Helpers\UserNameHelper;
 
+session_start();
+
+TokenHelper::createSecret();
 TokenHelper::createUserToken();
+TokenHelper::createCSRFToken();
 UserNameHelper::createUserName();
 
 $request = Request::createFromGlobals();

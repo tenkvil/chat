@@ -28,4 +28,8 @@ $routes->add('changeName', new Routing\Route('/changeName', [
     '_controller' => [ new ChatController(), 'changeNameAction' ]
 ]));
 
+$routes->add('getSettings', new Routing\Route('/getSettings', [
+    '_controller' => [ new ChatController(), 'getSettingsAction' ]
+]));
+
 return $routes;
